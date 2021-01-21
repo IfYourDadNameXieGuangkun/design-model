@@ -8,6 +8,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -17,6 +18,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = {FactoryMethodBootStrap.class, ApiTest.class})
@@ -39,18 +41,19 @@ public class ApiTest {
         AwardReq req01 = AwardReq.builder()
                 .uId("10001")
                 .awardNumber("EGM1023938910232121323432")
-                .awardType(1)
+                .awardType(2)//1,2,3
                 .bizId("791098764902132")
                 .build();
 
         System.out.println(BeanUtils.asJsonString(req01));
         mockMvc.perform(MockMvcRequestBuilders
-                .post("/getAward")
+                .post("/getNewAward")
                 .content(BeanUtils.asJsonString(req01))
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON)) //验证响应contentType
                 .andDo(MockMvcResultHandlers.print());
+
     }
 
 }
