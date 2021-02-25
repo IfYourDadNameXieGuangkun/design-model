@@ -13,6 +13,9 @@
     <version>0.0.1-SNAPSHOT</version>
     <modules>
         <module>design-factory-method</module>
+        <module>design-java8-stream</module>
+        <module>design-proxy-pattern</module>
+        <module>design-observe-pattern</module>
     </modules>
     <packaging>pom</packaging>
     <name>first-app-by-gui</name>
