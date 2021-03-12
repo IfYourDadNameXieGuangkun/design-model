@@ -17,6 +17,7 @@
         <module>design-proxy-pattern</module>
         <module>design-observe-pattern</module>
         <module>spring-core-make1</module>
+        <module>study-thread-make</module>
     </modules>
     <packaging>pom</packaging>
     <name>first-app-by-gui</name>
