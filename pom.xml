@@ -21,7 +21,9 @@
         <module>java-jvm-study</module>
         <module>design-singleton</module>
         <module>design-adapter</module>
+        <module>design-template</module>
         <module>study-thread-make</module>
+        <module>study-spring-project</module>
     </modules>
     <packaging>pom</packaging>
     <name>design-model</name>

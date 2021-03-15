@@ -1,4 +1,4 @@
-package com.java.jvm;
+package com.java.jvm.jvisualvm;
 
 public class Math {
     public static final int initData = 666;
