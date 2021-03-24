@@ -6,6 +6,9 @@ import spring.core.make1.annotation.GPRequestMapping;
 import spring.core.make1.annotation.GPRequestParam;
 import spring.core.make1.service.IDemoService;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 @GPController
 @GPRequestMapping("/name")
 public class DemoAction {
@@ -14,7 +17,7 @@ public class DemoAction {
     private IDemoService demoService;
 
     @GPRequestMapping("/query")
-    public String queryName(@GPRequestParam("name") String name) {
-        return demoService.getName(name);
+    public String queryName(HttpServletRequest req, HttpServletResponse resp) {
+        return demoService.getName("hello");
     }
 }
