@@ -100,7 +100,7 @@ public class GPDispatcherServlet extends HttpServlet {
             }
         }
         String beanName = toLowerFirstCase(method.getDeclaringClass().getSimpleName());
-        method.invoke(ioc.get(beanName), new Object[]{req, resp});
+        method.invoke(ioc.get(beanName), paramsValues);
 
     }
 
@@ -210,13 +210,13 @@ public class GPDispatcherServlet extends HttpServlet {
         for (Map.Entry<String, Object> entry : ioc.entrySet()) {
             //获取所有字段,包括private ,protected,default
             //正常来说,普通的OOP编程只能获得public类型的字段
-            Field[] fields = entry.getValue().getClass().getDeclaredFields();
-            for (Field field : fields) {
-                if (!field.isAnnotationPresent(GPAutowired.class)) continue;
-                GPAutowired autowired = field.getAnnotation(GPAutowired.class);
+            Field[] fields = entry.getValue().getClass().getDeclaredFields();  //1.获取ioc容器中的bean对象
+            for (Field field : fields) {//2.遍历bean对象中的容器字段
+                if (!field.isAnnotationPresent(GPAutowired.class)) continue;    //3.字段是否上标记@GPAutowired注解
+                GPAutowired autowired = field.getAnnotation(GPAutowired.class);//4.获取注解信息
 
                 //如果用户没有自定义 beanName,默认就根据类型注入
-                String beanName = autowired.value();
+                String beanName = autowired.value();//5.判断注解信息中 是否存在有别名
                 if ("".equals(beanName.trim())) {
 //                    beanName = toLowerFirstCase(field.getType().getName());
                     beanName = field.getType().getName();
