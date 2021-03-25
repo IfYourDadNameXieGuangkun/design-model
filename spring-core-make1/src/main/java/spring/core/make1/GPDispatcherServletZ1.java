@@ -16,13 +16,11 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 public class GPDispatcherServletZ1 extends HttpServlet {
     private Map<String, Object> mapping = new HashMap<String, Object>();
+    private Map<String, Object> ioc = new HashMap<String, Object>();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -43,13 +41,13 @@ public class GPDispatcherServletZ1 extends HttpServlet {
         String url = req.getRequestURI();
         String contextPath = req.getContextPath();
         url = url.replace(contextPath, "").replaceAll("/+", "/");
-        if (!this.mapping.containsKey(url)) {
+        if (!this.ioc.containsKey(url)) {
             resp.getWriter().write("404 Not Found!!");
             return;
         }
-        Method method = (Method) this.mapping.get(url);
+        Method method = (Method) this.ioc.get(url);
         Map<String, String[]> params = req.getParameterMap();
-        method.invoke(this.mapping.get(method.getDeclaringClass().getName()), req, resp, params.get("name")[0]);
+        method.invoke(this.ioc.get(method.getDeclaringClass().getName()), req, resp, params.get("name")[0]);
 
     }
 
@@ -57,15 +55,17 @@ public class GPDispatcherServletZ1 extends HttpServlet {
         InputStream is = null;
         try {
             Properties configContext = new Properties();
-            is = this.getClass().getClassLoader().getResourceAsStream( config.getInitParameter("contextConfigLocation"));
+            is = this.getClass().getClassLoader().getResourceAsStream(config.getInitParameter("contextConfigLocation"));
             configContext.load(is);
             String scanPackage = configContext.getProperty("scanPackage");
             doScanner(scanPackage);
+            ioc.putAll(mapping);
             for (String clazzName : mapping.keySet()) {
                 if (!clazzName.contains(".")) continue;
                 Class<?> clazz = Class.forName(clazzName);
                 if (clazz.isAnnotationPresent(GPController.class)) {
-                    mapping.put(clazzName, clazz.newInstance());
+//                    mapping.put(clazzName, clazz.newInstance());
+                    ioc.put(clazzName, clazz.newInstance());
                     String baseUrl = "";
                     if (clazz.isAnnotationPresent(GPRequestMapping.class)) {
                         GPRequestMapping requestMapping = clazz.getAnnotation(GPRequestMapping.class);
@@ -76,7 +76,8 @@ public class GPDispatcherServletZ1 extends HttpServlet {
                         if (!method.isAnnotationPresent(GPRequestMapping.class)) continue;
                         GPRequestMapping requestMapping = method.getAnnotation(GPRequestMapping.class);
                         String url = (baseUrl + "/" + requestMapping.value().replaceAll("/+", "/"));
-                        mapping.put(url, method);
+//                        mapping.put(url, method);
+                        ioc.put(url, method);
                         System.out.println("Mapped" + url + "," + method);
                     }
                 } else if (clazz.isAnnotationPresent(GPService.class)) {
@@ -86,13 +87,15 @@ public class GPDispatcherServletZ1 extends HttpServlet {
                         beanName = clazz.getName();
                     }
                     Object instance = clazz.newInstance();
-                    mapping.put(beanName, instance);
+//                    mapping.put(beanName, instance);
+                    ioc.put(beanName, instance);
                     for (Class<?> i : clazz.getInterfaces()) {
-                        mapping.put(i.getName(), instance);
+//                        mapping.put(i.getName(), instance);
+                        ioc.put(i.getName(), instance);
                     }
                 } else continue;
             }
-            for (Object object : mapping.values()) {
+            for (Object object : ioc.values()) {
                 if (null == object) continue;
                 Class clazz = object.getClass();
                 if (clazz.isAnnotationPresent(GPController.class)) {
@@ -106,7 +109,8 @@ public class GPDispatcherServletZ1 extends HttpServlet {
                         }
                         field.setAccessible(true);
                         try {
-                            field.set(mapping.get(clazz.getName()), mapping.get(beanName));
+//                            field.set(mapping.get(clazz.getName()), mapping.get(beanName));
+                            field.set(ioc.get(clazz.getName()), ioc.get(beanName));
                         } catch (IllegalAccessException e) {
                             e.printStackTrace();
                         }

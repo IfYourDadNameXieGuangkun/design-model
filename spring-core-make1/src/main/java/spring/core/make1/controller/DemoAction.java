@@ -8,16 +8,21 @@ import spring.core.make1.service.IDemoService;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @GPController
-@GPRequestMapping("/name")
+@GPRequestMapping("/demo")
 public class DemoAction {
 
     @GPAutowired
     private IDemoService demoService;
 
     @GPRequestMapping("/query")
-    public String queryName(HttpServletRequest req, HttpServletResponse resp) {
-        return demoService.getName("hello");
+    public void queryName(HttpServletRequest req, HttpServletResponse resp) {
+        try {
+            resp.getWriter().write(demoService.getName("hello"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
