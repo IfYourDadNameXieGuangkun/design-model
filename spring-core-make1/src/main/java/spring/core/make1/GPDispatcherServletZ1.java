@@ -18,6 +18,9 @@ import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
 
+/**
+ * 版本 1.0
+ */
 public class GPDispatcherServletZ1 extends HttpServlet {
     private Map<String, Object> mapping = new HashMap<String, Object>();
     private Map<String, Object> ioc = new HashMap<String, Object>();
@@ -51,6 +54,7 @@ public class GPDispatcherServletZ1 extends HttpServlet {
 
     }
 
+    @Override
     public void init(ServletConfig config) throws ServletException {
         InputStream is = null;
         try {

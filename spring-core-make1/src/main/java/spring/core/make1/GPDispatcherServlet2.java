@@ -1,7 +1,6 @@
 package spring.core.make1;
 
 import spring.core.make1.annotation.*;
-import spring.core.make1.convert.*;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -11,14 +10,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-public class GPDispatcherServlet extends HttpServlet {
+/**
+ * 版本2.0
+ */
+public class GPDispatcherServlet2 extends HttpServlet {
     /**
      * 声明全局成员变量
      */
@@ -36,8 +37,7 @@ public class GPDispatcherServlet extends HttpServlet {
     private Map<String, Object> ioc = new HashMap<String, Object>();
 
     //保存url 和Method的对应关系
-//    private Map<String, Object> HandlerMapping1 = new HashMap<String, Object>();
-    private List<Handler> HandlerMapping = new ArrayList<Handler>();
+    private Map<String, Object> HandlerMapping = new HashMap<String, Object>();
 
 
     @Override
@@ -56,82 +56,57 @@ public class GPDispatcherServlet extends HttpServlet {
     }
 
     private void doDispatch(HttpServletRequest req, HttpServletResponse resp) throws Exception {
-        Handler handler = getHandler(req);
-        if (!Optional.ofNullable(handler).isPresent()) {
+        String url = req.getRequestURI();
+        String contextPath = req.getContextPath();
+        url = url.replace(contextPath, "").replaceAll("/+", "/");
+        if (!this.HandlerMapping.containsKey(url)) {
             resp.getWriter().write("404 Not Found!!");
             return;
         }
-
+        Method method = (Method) this.HandlerMapping.get(url);
         //第一个参数:方法所在的实例
         //第二个参数:调用时所需要的实参
         Map<String, String[]> params = req.getParameterMap();
         //获取方法的形参列表
-        Class<?>[] parameterTypes = handler.method.getParameterTypes();
+        Class<?>[] parameterTypes = method.getParameterTypes();
         //保存请求的url参数列表
         Map<String, String[]> parameterMap = req.getParameterMap();
         //保存复制参数的位置
         Object[] paramsValues = new Object[parameterTypes.length];
-
-        for (Map.Entry<String, String[]> param : parameterMap.entrySet()) {
-            String value = Arrays.toString(param.getValue()).replaceAll("\\[|\\]", "").replaceAll("\\s", ",");
-            if (!handler.paramsIndexMapping.containsKey(param.getKey())) continue;
-            int index = handler.paramsIndexMapping.get(param.getKey());
-            paramsValues[index] = convert(parameterTypes[index], value);
-            if (handler.paramsIndexMapping.containsKey(HttpServletRequest.class.getName())) {
-                Integer reqIndex = handler.paramsIndexMapping.get(HttpServletRequest.class.getName());
-                paramsValues[reqIndex] = req;
-            }
-            if (handler.paramsIndexMapping.containsKey(HttpServletResponse.class.getName())) {
-                Integer respIndex = handler.paramsIndexMapping.get(HttpServletResponse.class.getName());
-                paramsValues[respIndex] = resp;
-            }
-
-        }
         //根据参数位置动态赋值
-        Object returnValue = handler.method.invoke(handler.controller, paramsValues);
-        if (Optional.ofNullable(returnValue).isPresent()) {
-            resp.getWriter().write(returnValue.toString());
-        }
-        return;
-    }
-
-
-    private Handler getHandler(HttpServletRequest req) {
-        if (HandlerMapping.isEmpty()) return null;
-        String url = req.getRequestURI();
-        String contextPath = req.getContextPath();
-        url = url.replace(contextPath, "").replaceAll("/+", "/");
-        for (Handler handler : HandlerMapping) {
-            try {
-                Matcher matcher = handler.pattern.matcher(url);
-                if (!matcher.matches()) continue;
-                return handler;
-            } catch (Exception e) {
-                throw e;
+        for (int i = 0; i < parameterTypes.length; i++) {
+            Class parameterType = parameterTypes[i];
+            if (parameterType == HttpServletRequest.class) {
+                paramsValues[i] = req;
+                continue;
+            }
+            if (parameterType == HttpServletResponse.class) {
+                paramsValues[i] = resp;
+                continue;
+            }
+            if (parameterType == String.class) {
+                //提取方法中加了注解的参数
+                Annotation[][] pa = method.getParameterAnnotations();
+                for (int j = 0; j < pa.length; j++) {
+                    for (Annotation annotation : pa[j]) {
+                        if (annotation instanceof GPRequestParam) {
+                            String paramName = ((GPRequestParam) annotation).value();
+                            if (!"".equals(paramName.trim())) {
+                                String value = Arrays.toString(parameterMap.get(paramName))
+                                        .replaceAll("\\[|\\]", "")
+                                        .replaceAll("\\s", "");
+                                paramsValues[i] = value;
+                            }
+                        }
+                    }
+                }
             }
         }
-        return null;
+        String beanName = toLowerFirstCase(method.getDeclaringClass().getSimpleName());
+        method.invoke(ioc.get(beanName), paramsValues);
+
     }
 
-    /**
-     * @param type
-     * @param value
-     * @return
-     * @desc url传过来的参数都是String 类型,由于Http基于字符串协议,只需要把String 转换为任意类型 double Integer Long
-     * @design:设计模式:策略设计模式
-     */
-    private Object convert(Class<?> type, String value) {
-        if (type == Integer.class) {
-            return new Context(new IntegerConvert()).doTypeConvert(type, value);
-        }
-        if (type == Long.class) {
-            return new Context(new LongConvert()).doTypeConvert(type, value);
-        }
-        if (type == Double.class) {
-            return new Context(new DoubleConvert()).doTypeConvert(type, value);
-        }
-        return value;
-    }
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -150,7 +125,7 @@ public class GPDispatcherServlet extends HttpServlet {
         //5.初始化HandlerMapping
         initHandlerMapping();
 
-        System.out.println("GP MVC Framework is init v3");
+        System.out.println("GP MVC Framework is init v2");
 
     }
 
@@ -282,12 +257,9 @@ public class GPDispatcherServlet extends HttpServlet {
             for (Method method : clazz.getMethods()) {
                 if (!method.isAnnotationPresent(GPRequestMapping.class)) continue;
                 GPRequestMapping requestMapping = method.getAnnotation(GPRequestMapping.class);
-//                String url = ("/" + baseUrl + "/" + requestMapping.value()).replaceAll("/+", "/");
-                String regex = ("/" + baseUrl + "/" + requestMapping.value()).replaceAll("/+", "/");
-//                HandlerMapping.put(url, method);
-                Pattern pattern = Pattern.compile(regex);
-                HandlerMapping.add(new Handler(pattern, entry.getValue(), method));
-                System.out.println("Mapped:" + regex + "-" + method);
+                String url = ("/" + baseUrl + "/" + requestMapping.value()).replaceAll("/+", "/");
+                HandlerMapping.put(url, method);
+                System.out.println("Mapped:" + url + "-" + method);
             }
         }
     }
