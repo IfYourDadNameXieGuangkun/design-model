@@ -35,8 +35,6 @@ public class GPDispatcherServlet extends HttpServlet {
      */
     private Map<String, Object> ioc = new HashMap<String, Object>();
 
-    //保存url 和Method的对应关系
-//    private Map<String, Object> HandlerMapping1 = new HashMap<String, Object>();
     private List<Handler> HandlerMapping = new ArrayList<Handler>();
 
 
@@ -62,9 +60,6 @@ public class GPDispatcherServlet extends HttpServlet {
             return;
         }
 
-        //第一个参数:方法所在的实例
-        //第二个参数:调用时所需要的实参
-        Map<String, String[]> params = req.getParameterMap();
         //获取方法的形参列表
         Class<?>[] parameterTypes = handler.method.getParameterTypes();
         //保存请求的url参数列表
@@ -72,6 +67,9 @@ public class GPDispatcherServlet extends HttpServlet {
         //保存复制参数的位置
         Object[] paramsValues = new Object[parameterTypes.length];
 
+        /**
+         * 遍历参数找到对应的位置,V3.0可以传入多个参数
+         */
         for (Map.Entry<String, String[]> param : parameterMap.entrySet()) {
             String value = Arrays.toString(param.getValue()).replaceAll("\\[|\\]", "").replaceAll("\\s", ",");
             if (!handler.paramsIndexMapping.containsKey(param.getKey())) continue;

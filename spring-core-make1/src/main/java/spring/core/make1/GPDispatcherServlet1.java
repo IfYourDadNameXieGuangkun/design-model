@@ -21,7 +21,7 @@ import java.util.*;
 /**
  * 版本 1.0
  */
-public class GPDispatcherServletZ1 extends HttpServlet {
+public class GPDispatcherServlet1 extends HttpServlet {
     private Map<String, Object> mapping = new HashMap<String, Object>();
     private Map<String, Object> ioc = new HashMap<String, Object>();
 

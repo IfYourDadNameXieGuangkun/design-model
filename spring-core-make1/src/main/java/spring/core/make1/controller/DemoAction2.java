@@ -10,20 +10,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-/**
- * 版本V3可传入多个参数,并支持多种
- */
 @GPController
-@GPRequestMapping("/demo")
-public class DemoAction {
+@GPRequestMapping("/demo2")
+public class DemoAction2 {
 
     @GPAutowired
     private IDemoService demoService;
 
     @GPRequestMapping("/query")
-    public void queryName(HttpServletRequest req, HttpServletResponse resp, @GPRequestParam("name") String name, @GPRequestParam("age") Integer age) {
+    public void queryName(HttpServletRequest req, HttpServletResponse resp, @GPRequestParam("name") String name) {
         try {
-            resp.getWriter().write(demoService.getName(name) + ",age:" + age);
+            resp.getWriter().write(demoService.getName(name));
         } catch (IOException e) {
             e.printStackTrace();
         }
