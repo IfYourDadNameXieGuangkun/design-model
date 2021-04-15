@@ -27,4 +27,6 @@
                                                                                                                                               			// recurse
                                                                                                                                               			doRegisterBeanDefinitions(ele);
                                                                                                                                               		}
-    3)
+    3)<bean>的解析在parseDefaultElement()--->processBeanDefinition(ele, delegate);-->BeanDefinitionHolder bdHolder = delegate.parseBeanDefinitionElement(ele);
+    4)解析成为 BeanDefinitionHolder 后 想容器中进行注册-->registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
+    5)registerBeanDefinition 的实现是在 DefaultListableBeanFactory中实现????为啥
