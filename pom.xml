@@ -16,7 +16,7 @@
         <module>design-java8-stream</module>
         <module>design-proxy-pattern</module>
         <module>design-observe-pattern</module>
-        <module>spring-core-make1</module>
+        <module>spring-ioc-make1</module>
         <module>interview-threadpool</module>
         <module>java-jvm-study</module>
         <module>design-singleton</module>
@@ -24,7 +24,7 @@
         <module>design-template</module>
         <module>study-thread-make</module>
         <module>study-spring-project</module>
-        <module>spring-core-make2</module>
+        <module>spring-ioc-make2</module>
     </modules>
     <packaging>pom</packaging>
     <name>design-model</name>
