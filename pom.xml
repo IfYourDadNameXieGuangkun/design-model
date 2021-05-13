@@ -25,6 +25,7 @@
         <module>study-thread-make</module>
         <module>study-spring-project</module>
         <module>spring-ioc-make2</module>
+        <module>spring-boot-project</module>
     </modules>
     <packaging>pom</packaging>
     <name>design-model</name>
