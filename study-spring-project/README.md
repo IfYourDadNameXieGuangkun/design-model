@@ -15,9 +15,7 @@
 ####4.将Bean配置文件解析成为文档对象之后,下一步将文档对象解析成为Spring IOC管理的Bean对象并将其注册到容器中--->分配解析策略:
     1)在Document doc = doLoadDocument(inputSource, resource)之后,执行int count = registerBeanDefinitions(doc, resource); 方法,进行Bean配置信息的解析&&载入
     2)接着doRegisterBeanDefinitions(doc.getDocumentElement())-->parseBeanDefinitions(root, this.delegate)--->parseDefaultElement(ele, delegate);-->最终对xml中的元素标签 <import>、<alias>、<bean>、<beans>进行解析
-
-
-###[2]注解模式加载Bean信息                                                                                                                                if (delegate.nodeNameEquals(ele, IMPORT_ELEMENT)) {
+                                                                                                                               if (delegate.nodeNameEquals(ele, IMPORT_ELEMENT)) {
                                                                                                                                               			importBeanDefinitionResource(ele);
                                                                                                                                               		}
                                                                                                                                               		else if (delegate.nodeNameEquals(ele, ALIAS_ELEMENT)) {
@@ -34,3 +32,7 @@
     4)解析成为 BeanDefinitionHolder 后 想容器中进行注册-->registry.registerBeanDefinition(beanName, definitionHolder.getBeanDefinition());
     5)registerBeanDefinition 的实现是在 DefaultListableBeanFactory中实现????为啥
     6)先不管第五步,我们继续走 注册BeanDefinition的具体实现在 DefaultListableBeanFactory 中的 registerBeanDefinition(String beanName, BeanDefinition beanDefinition) 方法,将BeanDefinition注册到 beanDefinitionMap 方法中 ,完成BeanDefinition的注册
+    
+    
+    
+###[2]注解模式加载Bean信息 

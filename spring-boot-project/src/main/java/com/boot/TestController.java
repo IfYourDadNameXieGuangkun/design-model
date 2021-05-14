@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/")
@@ -18,6 +20,8 @@ public class TestController {
         String json = IOUtils.toString(in, "UTF-8");
         json = URLDecoder.decode(json, "UTF-8");
         System.out.println(json);
+        Map<String, Object> map = new HashMap<>();
+        map.put("a","b");
     }
 
 }

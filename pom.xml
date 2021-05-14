@@ -26,6 +26,7 @@
         <module>study-spring-project</module>
         <module>spring-ioc-make2</module>
         <module>spring-boot-project</module>
+        <module>study-exception-handler</module>
     </modules>
     <packaging>pom</packaging>
     <name>design-model</name>
@@ -121,5 +122,32 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <!-- 本地环境 -->
+        <profile>
+            <id>local</id>
+            <properties>
+                <spring.profiles.active>local</spring.profiles.active>
+            </properties>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+        </profile>
+        <!-- 开发环境 -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <spring.profiles.active>dev</spring.profiles.active>
+            </properties>
+        </profile>
+        <!-- 生产环境 -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <spring.profiles.active>prod</spring.profiles.active>
+            </properties>
+        </profile>
+    </profiles>
 
 </project>
