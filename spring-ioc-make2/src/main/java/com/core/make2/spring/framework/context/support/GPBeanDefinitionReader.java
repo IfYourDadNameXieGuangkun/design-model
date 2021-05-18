@@ -13,6 +13,7 @@ import java.util.Properties;
  * 对配置文件进行查找、读取、解析
  */
 public class GPBeanDefinitionReader {
+    //放入配置路径中获取到的Bean对象
     private List<String> registerBeanClasses = new ArrayList<String>();
     private Properties config = new Properties();
     //固定配置文件中的key ,相对于XML的规范
@@ -38,13 +39,14 @@ public class GPBeanDefinitionReader {
     }
 
     private void doScanner(String scanPackage) {
-        URL url = this.getClass().getClassLoader().getResource("/" + scanPackage.replaceAll("\\.", ""));
+        //转换为文件路径,实际上就是把.替换成/
+        URL url = this.getClass().getClassLoader().getResource("/" + scanPackage.replaceAll("\\.", "/"));
         File classPath = new File(url.getFile());
         for (File file : classPath.listFiles()) {
             if (file.isDirectory()) {
                 doScanner(scanPackage + "." + file.getName());
             } else {
-                if (!file.getName().endsWith(".class")) continue;
+                if (!file.getName().endsWith(".class")) {continue;}
                 String className = scanPackage + "." + file.getName().replace(".class", "");
                 registerBeanClasses.add(className);
             }
@@ -52,7 +54,7 @@ public class GPBeanDefinitionReader {
     }
 
     public Properties getConfig() {
-        return config;
+        return this.config;
     }
 
     //把配置文件中扫描到的所有配置信息转换为GPBeanDefinition 对象,以便于之后的IOC操作
@@ -61,7 +63,7 @@ public class GPBeanDefinitionReader {
         try {
             for (String className : registerBeanClasses) {
                 Class<?> beanClass = Class.forName(className);
-                if (beanClass.isInterface()) continue;
+                if (beanClass.isInterface()) {continue;}
                 result.add(doCreateBeanDefinition(toLowerFirstCase(beanClass.getSimpleName()), beanClass.getName()));
                 Class<?>[] interfaces = beanClass.getInterfaces();
                 for (Class<?> i : interfaces) {

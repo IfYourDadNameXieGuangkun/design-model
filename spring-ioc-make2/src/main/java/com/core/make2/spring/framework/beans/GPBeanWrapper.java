@@ -18,8 +18,8 @@ public class GPBeanWrapper {
 
 
     /**
-     * 返回代理以后的Class
-     * 肯呢个回事这个$proxy0
+     * 返回代理以后的 Class
+     * 可能回事这个 $proxy0
      *
      * @return
      */

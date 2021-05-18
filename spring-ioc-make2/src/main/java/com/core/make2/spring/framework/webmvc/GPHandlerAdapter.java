@@ -66,7 +66,7 @@ public class GPHandlerAdapter {
 
         for (Map.Entry<String, String[]> param : reqParameterMap.entrySet()) {
             String value = Arrays.toString(param.getValue()).replaceAll("\\[|\\]", "").replaceAll("\\s", ",");
-            if (!paramsIndexMapping.containsKey(param.getKey())) continue;
+            if (!paramsIndexMapping.containsKey(param.getKey())) {continue;}
             int index = paramsIndexMapping.get(param.getKey());
             //因为页面传过来的值都是String 类型的,而在方法中定义的类型是千变万化的
             //所以要针对我们传过来的参数进行类型转换
@@ -81,6 +81,7 @@ public class GPHandlerAdapter {
             }
 
         }
+        //4.从handler中取出Controller、Method,然后利用反射机制进行调用
         Object result = handlerMapping.getMethod().invoke(handlerMapping.getController(), paramsValues);
         if (!Optional.ofNullable(result).isPresent()) {
             return null;

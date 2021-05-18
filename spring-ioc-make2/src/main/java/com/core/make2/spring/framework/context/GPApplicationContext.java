@@ -30,7 +30,7 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
     //单例的IOC容器缓存
     private Map<String, Object> factoryBeanObjectCache = new ConcurrentHashMap<String, Object>();
 
-    //通用Ioc容器
+    //通用Ioc容器,保存GPBeanWrapper的缓存
     private Map<String, GPBeanWrapper> factoryBeanInstanceCache = new ConcurrentHashMap<String, GPBeanWrapper>();
 
     public GPApplicationContext(String... configLocations) {
@@ -87,6 +87,9 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
     }
 
     /**
+     * 依赖注入,从这里开始,读取BeanDefinition中的信息
+     * 然后通过反射机制创建一个实例并返回
+     * Spring的做法是不会吧最原始的对象放出去,会用一个BeanWrapper来进行一次包装
      * 装饰器模式:
      * 1.保留原来的OOP关系
      * 2.需要对它进行扩展,增强(为了以后AOP打基础)
@@ -96,28 +99,33 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
      * @throws Exception
      */
     @Override
-    public Object getBean(String beanName) throws Exception {
-        GPBeanDefinition beanDefinition = super.beanDefinitionMap.get(beanName);
-        //生成通知事件
-        GPBeanPostProcessor beanPostProcessor = new GPBeanPostProcessor();
-        Object instance = instantiateBean(beanDefinition);
-        if (null == instance) {
+    public Object getBean(String beanName) {
+        try {
+            GPBeanDefinition beanDefinition = super.beanDefinitionMap.get(beanName);
+            //生成通知事件
+            GPBeanPostProcessor beanPostProcessor = new GPBeanPostProcessor();
+            Object instance = instantiateBean(beanDefinition);
+            if (null == instance) {
+                return null;
+            }
+            //再实例化之前调用一次
+            beanPostProcessor.postProcessBeforeInitialization(instance, beanName);
+
+            GPBeanWrapper beanWrapper = new GPBeanWrapper(instance);
+
+            this.factoryBeanInstanceCache.put(beanName, beanWrapper);
+
+            //再实例化之后调用一次
+            beanPostProcessor.postProcessAfterInitialization(instance, beanName);
+
+            populateBean(beanName, instance);
+
+            //通过这样调用,相当于给我们自己留有了可操作的空间
+            return this.factoryBeanInstanceCache.get(beanName).getWrappedInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
             return null;
         }
-        //再实例化之前调用一次
-        beanPostProcessor.postProcessBeforeInitialization(instance, beanName);
-
-        GPBeanWrapper beanWrapper = new GPBeanWrapper(instance);
-
-        this.factoryBeanInstanceCache.put(beanName, beanWrapper);
-
-        //再实例化之后调用一次
-        beanPostProcessor.postProcessAfterInitialization(instance, beanName);
-
-        populateBean(beanName, instance);
-
-        //
-        return null;
     }
 
     private void populateBean(String beanName, Object instance) {
@@ -138,9 +146,9 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
             }
             field.setAccessible(true);
             try {
-                field.set(instance,this.factoryBeanInstanceCache.get(autowiredBeanName).getWrappedInstance());
+                field.set(instance, this.factoryBeanInstanceCache.get(autowiredBeanName).getWrappedInstance());
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
         }
     }
@@ -150,11 +158,12 @@ public class GPApplicationContext extends GPDefaultListableBeanFactory implement
         Object instance = null;
         String className = beanDefinition.getBeanClassName();
         try {
-            if (this.factoryBeanInstanceCache.containsKey(className)) {
-                instance = factoryBeanInstanceCache.get(className);
+            if (this.factoryBeanObjectCache.containsKey(className)) {
+                instance = this.factoryBeanObjectCache.get(className);
             } else {
                 Class<?> clazz = Class.forName(className);
                 instance = clazz.newInstance();
+                this.factoryBeanObjectCache.put(beanDefinition.getFactoryBeanName(),instance);
             }
             return instance;
         } catch (Exception e) {
