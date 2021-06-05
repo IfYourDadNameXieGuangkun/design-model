@@ -1,7 +1,6 @@
 package com.design;
 
-import com.design.model.Aye;
-import com.design.model.card.IQiYiCard;
+
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.boot.Banner;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

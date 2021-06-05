@@ -27,6 +27,9 @@
         <module>spring-ioc-make2</module>
         <module>spring-boot-project</module>
         <module>study-exception-handler</module>
+        <module>design-simple-factory</module>
+        <module>design-factory-project</module>
+        <module>design-prototype-pattern</module>
     </modules>
     <packaging>pom</packaging>
     <name>design-model</name>

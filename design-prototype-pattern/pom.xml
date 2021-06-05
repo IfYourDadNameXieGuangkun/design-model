@@ -9,8 +9,8 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>design-template</artifactId>
-    <name>模板模式</name>
+    <artifactId>design-prototype-pattern</artifactId>
+    <name>原型模式</name>
 
 
 </project>
