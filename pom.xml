@@ -30,6 +30,7 @@
         <module>design-simple-factory</module>
         <module>design-factory-project</module>
         <module>design-prototype-pattern</module>
+        <module>design-strategy-pattern</module>
     </modules>
     <packaging>pom</packaging>
     <name>design-model</name>
