@@ -32,6 +32,7 @@
         <module>design-prototype-pattern</module>
         <module>design-strategy-pattern</module>
         <module>java-basic-study</module>
+        <module>study-redis-utils</module>
     </modules>
     <packaging>pom</packaging>
     <name>design-model</name>

@@ -24,6 +24,8 @@ public class BootStrap {
 
         System.out.println("异步吗");
 
+
+
     }
 
 }
