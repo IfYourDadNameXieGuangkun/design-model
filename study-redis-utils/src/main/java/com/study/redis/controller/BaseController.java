@@ -22,7 +22,7 @@ public class BaseController {
      */
     @RequestMapping("/get")
     public void get() {
-        Object o = redisDao.get("PROMOTION:zy:MZHE:3003");
+        String o = (String)redisDao.get("TXD_ACCESS_TOKEN");
         System.out.println(o);
     }
 

@@ -33,6 +33,7 @@
         <module>design-strategy-pattern</module>
         <module>java-basic-study</module>
         <module>study-redis-utils</module>
+        <module>spring-aop-make</module>
     </modules>
     <packaging>pom</packaging>
     <name>design-model</name>
