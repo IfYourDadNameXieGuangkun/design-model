@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd"
+>
+
+    <!-- 开启aop注解方式,默认为false -->
+    <aop:aspectj-autoproxy/>
+<!--    <bean id="waiter" class="aye.spring.study._1使用AspectJproxyFactory手动织入.NativeWaiter"/>-->
+    <bean id="xmlWaiter" class="aye.spring.study._2xml配置自动织入.XmlNativeWaiter"/>
+    <bean class="aye.spring.study._1使用AspectJproxyFactory手动织入.PreGreetingAspect"/>
+</beans>
+
